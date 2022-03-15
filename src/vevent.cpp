@@ -9,6 +9,7 @@
 #include "uICAL/vevent.h"
 #include "uICAL/vline.h"
 #include "uICAL/vobject.h"
+#include "uICAL/error.h"
 
 namespace uICAL {
     VEvent::VEvent(const VObject_ptr& obj, const TZMap_ptr& tzmap) {
@@ -18,12 +19,20 @@ namespace uICAL {
         VLine_ptr rRule = obj->getPropertyByName("RRULE");
         VLine_ptr summary = obj->getPropertyByName("SUMMARY");
 
+        if (dtStart == nullptr) { throw ImplementationError("all events must have a DTSTART"); }
+        if (dtEnd == nullptr) { throw ImplementationError("all events must have a DTEND"); }
+        if (summary == nullptr) { throw ImplementationError("all events must have a SUMMARY"); }
+
         this->start = DateTime(dtStart->value + dtStart->getParam("TZID"), tzmap);
         this->end = DateTime(dtEnd->value + dtStart->getParam("TZID"), tzmap);
 
         this->summary = summary->value;
 
-        this->rrule = new_ptr<RRule>(rRule->value, this->start);
+        if (rRule != nullptr) {
+            this->rrule = new_ptr<RRule>(rRule->value, this->start);
+        } else {
+            this->rrule = new_ptr<RRule>("", this->start);
+        }
     }
 
     void VEvent::str(ostream& out) const {

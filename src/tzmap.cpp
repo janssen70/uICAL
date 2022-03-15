@@ -7,6 +7,7 @@
 #include "uICAL/tz.h"
 #include "uICAL/vline.h"
 #include "uICAL/vobject.h"
+#include "uICAL/error.h"
 
 namespace uICAL {
     TZMap::TZMap() {
@@ -18,8 +19,20 @@ namespace uICAL {
         auto standards = timezone->listObjects("STANDARD");
         for (auto standard : standards) {
 
-            string offset = standard->getPropertyByName("TZOFFSETFROM")->value;
-            string name = standard->getPropertyByName("TZNAME")->value;
+            VLine_ptr tmp;
+            string offset, name;
+
+            tmp = standard->getPropertyByName("TZOFFSETFROM");
+            if (tmp != nullptr) {
+                offset = tmp->value;
+            } else {
+                throw ImplementationError("all timezones must have TZOFFSETFROM");
+            }
+
+            tmp = standard->getPropertyByName("TZNAME");
+            if (tmp != nullptr) {
+                name = tmp->value;
+            }
 
             this->add(tzId, name, offset);
         }
