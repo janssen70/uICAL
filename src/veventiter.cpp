@@ -15,7 +15,7 @@ namespace uICAL {
     : ice(ice)
     {
         this->range_begin = begin;
-        this->rrule = new_ptr<RRuleIter>(this->ice->rrule, DateTime(), end);
+        this->rrule = new_ptr<RRuleIter>(this->ice->rrule, begin, end);
     }
 
     bool VEventIter::next() {
