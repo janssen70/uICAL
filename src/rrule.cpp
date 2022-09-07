@@ -154,7 +154,7 @@ namespace uICAL {
             case Freq::MINUTELY:  return "MINUTELY";
             case Freq::HOURLY:    return "HOURLY";
             case Freq::DAILY:     return "DAILY";
-            case Freq::WEEKLY:    return "WEELKY";
+            case Freq::WEEKLY:    return "WEEKLY";
             case Freq::MONTHLY:   return "MONTHLY";
             case Freq::YEARLY:    return "WEEKLY";
             default:
