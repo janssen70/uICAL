@@ -26,8 +26,18 @@ namespace uICAL {
         return nullptr;
     }
 
-    VObject::vector VObject::listObjects(const string& name) const {
-        VObject::vector ret;
+    std::vector<VLine_ptr> VObject::getPropertiesByName(const string& name) const {
+        std::vector<VLine_ptr> ret;
+        for (auto line : this->lines) {
+            if (line->name == name) {
+                ret.push_back(line);
+            }
+        }
+        return ret;
+    }
+
+    std::vector<VObject_ptr> VObject::listObjects(const string& name) const {
+        std::vector<VObject_ptr> ret;
         for (auto child : this->children) {
             if (child->name == name) {
                 ret.push_back(child);

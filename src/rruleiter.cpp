@@ -85,14 +85,20 @@ namespace uICAL {
 
     bool RRuleIter::next() {
         if (this->cascade->size() == 0) {
-            return this->start();
+            if (!this->start()) {
+                return false;
+            }
+            if (!this->rr->excluded(this->now())) {
+                this->count --;
+                return true;
+            }
         }
 
-        if (this->count > 0) {
-            this->count --;
-        }
         if (this->count == 0) {
             return false;
+        }
+        if (this->count > 0) {
+            this->count --;
         }
 
         for (;;) {

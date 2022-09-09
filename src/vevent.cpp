@@ -33,6 +33,11 @@ namespace uICAL {
         } else {
             this->rrule = new_ptr<RRule>("", this->start);
         }
+
+        auto exdates = obj->getPropertiesByName("EXDATE");
+        for (auto exdate : exdates) {
+            this->rrule->exclude(DateTime(exdate->value + exdate->getParam("TZID"), tzmap));
+        }
     }
 
     void VEvent::str(ostream& out) const {

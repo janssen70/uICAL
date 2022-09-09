@@ -54,6 +54,8 @@ namespace uICAL {
                 if (line == "DTSTART") return true;
                 if (line == "DTEND") return true;
                 if (line == "RRULE") return true;
+                if (line == "EXDATE") return true;
+
             }
             return false;
         };

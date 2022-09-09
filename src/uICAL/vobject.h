@@ -17,8 +17,8 @@ namespace uICAL {
             virtual const string& getName() const;
 
             VLine_ptr getPropertyByName(const string& name) const;
-            using vector = std::vector<VObject_ptr>;
-            vector listObjects(const string& name) const;
+            std::vector<VLine_ptr> getPropertiesByName(const string& name) const;
+            std::vector<VObject_ptr> listObjects(const string& name) const;
 
             void str(ostream& out) const;
 
