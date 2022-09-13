@@ -56,11 +56,13 @@ static void run_tests(const std::string dat_file, test_f test)
             dtstart.clear();
             rrule.clear();
             expected.clear();
+            excludes.clear();
         }
         else if (line.find(" ") == 0 || line.length() == 0) {
             dtstart.clear();
             rrule.clear();
             expected.clear();
+            excludes.clear();
         }
         else {
             FAIL("! bad line (" << i <<"): \"" << line << "\"");
