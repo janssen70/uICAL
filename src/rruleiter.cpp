@@ -57,6 +57,9 @@ namespace uICAL {
             return false;
         }
         this->count = this->rr->count;
+        this->include = this->rr->includes.begin();
+        this->exclude = this->rr->excludes.begin();
+
         this->setCurrentNow();
 
         if (this->range_begin.valid()) {
@@ -70,14 +73,15 @@ namespace uICAL {
     }
 
     DateTime RRuleIter::now() const {
-        if (this->count != 0) {
+        if (this->cascade->size() == 0) {
+            throw RecurrenceError("Not yet initialised, call next() first");
+        }
+
+        if (this->count != 0 || this->include != this->rr->includes.end()) {
             if (!this->current_now.valid()) {
                 throw ImplementationError("Now is invalid");
             }
             return this->current_now;
-        }
-        if (this->cascade->size() == 0) {
-            throw RecurrenceError("Not yet initialised, call next() first");
         }
 
         throw RecurrenceError("No more occurrences");
@@ -88,76 +92,76 @@ namespace uICAL {
             if (!this->start()) {
                 return false;
             }
-            if (!this->rr->excluded(this->now())) {
-                this->count --;
-                return true;
-            }
-        }
-
-        if (this->count == 0) {
-            return false;
-        }
-        if (this->count > 0) {
-            this->count --;
-        }
-
-        for (;;) {
-            if (!this->nextExclude()) {
+        } else {
+            if (this->count == 0 && this->include == this->rr->includes.end()) {
                 return false;
             }
-            if (this->now().valid()) {
-                break;
+
+            if (!this->nextNow()) {
+                return false;
             }
         }
 
-        if (this->expired(this->now())) {
+        if (this->range_end.valid() && this->now() > this->range_end) {
             this->count = 0;
+            this->include = this->rr->includes.end();
             return false;
-        }
-
-        return true;
-    }
-
-    bool RRuleIter::expired(const DateTime& current) const {
-        if (this->rr->until.valid() && current > this->rr->until) {
-            return true;
-        }
-        if (this->range_end.valid() && current > this->range_end) {
-            return true;
-        }
-        return false;
-    }
-
-    bool RRuleIter::nextExclude() {
-        if (!this->nextNow()) {
-            return false;
-        }
-
-        if (this->rr->excludes.size()) {
-            for (;;) {
-                if (!this->rr->excluded(this->now())) {
-                    break;
-                }
-                if (!this->nextNow()) {
-                    return false;
-                }
-            }
         }
 
         return true;
     }
 
     bool RRuleIter::nextNow() {
-        if (!this->cascade->next()) {
+        DateTime cascade_now = DateTime(this->cascade->value(), this->rr->dtstart.tz);
+        if (this->include != this->rr->includes.end() && * this->include < cascade_now) {
+            ++ this->include;
+        } else if (this->count != 0) {
+            while (this->include != this->rr->includes.end() && * this->include == cascade_now) {
+                ++ this->include;
+            }
+            if (!this->cascade->next()) {
+                return false;
+            } else if (this->count != -1) {
+                -- this->count;
+            }
+        } else if (this->count != 0) {
+            if (!this->cascade->next()) {
+                return false;
+            } else if (this->count != -1) {
+                -- this->count;
+            }
+        } else if (this->include != this->rr->includes.end()) {
+            ++ this->include;
+        } else {
             return false;
         }
-        this->setCurrentNow();
-        return true;
+
+        return this->setCurrentNow();
     }
 
-    void RRuleIter::setCurrentNow() {
+    bool RRuleIter::setCurrentNow() {
         DateStamp now = this->cascade->value();
         this->current_now = DateTime(now, this->rr->dtstart.tz);
+        if (this->rr->until.valid() && this->current_now > this->rr->until) {
+            this->count = 0;
+        }
+
+        if (this->include != this->rr->includes.end() && (* this->include < this->current_now || this->count == 0)) {
+            this->current_now = * this->include;
+        } else if (this->count == 0) {
+            return false;
+        }
+
+        while (this->exclude != this->rr->excludes.end()) {
+            if (* this->exclude == this->current_now) {
+                return this->nextNow();
+            } else if (* this->exclude < this->current_now) {
+                ++ this->exclude ;
+            } else {
+                break;
+            }
+        }
+        return true;
     }
 
     /*

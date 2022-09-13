@@ -34,9 +34,14 @@ namespace uICAL {
             this->rrule = new_ptr<RRule>("", this->start);
         }
 
+        auto rdates = obj->getPropertiesByName("RDATE");
+        for (auto date : rdates) {
+            this->rrule->include(DateTime(date->value + date->getParam("TZID"), tzmap));
+        }
+
         auto exdates = obj->getPropertiesByName("EXDATE");
-        for (auto exdate : exdates) {
-            this->rrule->exclude(DateTime(exdate->value + exdate->getParam("TZID"), tzmap));
+        for (auto date : exdates) {
+            this->rrule->exclude(DateTime(date->value + date->getParam("TZID"), tzmap));
         }
     }
 

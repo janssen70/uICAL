@@ -55,6 +55,7 @@ namespace uICAL {
                 if (line == "DTEND") return true;
                 if (line == "RRULE") return true;
                 if (line == "EXDATE") return true;
+                if (line == "RDATE") return true;
 
             }
             return false;

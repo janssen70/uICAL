@@ -24,10 +24,8 @@ namespace uICAL {
             using sync_f = std::function<void(counters_t::iterator it)>;
 
             bool start();
-            bool expired(const DateTime& current) const;
-            bool nextExclude();
             bool nextNow();
-            void setCurrentNow();
+            bool setCurrentNow();
 
             void setupCounters(const DateStamp& base);
 
@@ -40,6 +38,8 @@ namespace uICAL {
             int count;
 
             DateTime current_now;
+            std::vector<DateTime>::iterator include;
+            std::vector<DateTime>::iterator exclude;
     };
 }
 #endif

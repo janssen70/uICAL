@@ -15,6 +15,7 @@ namespace uICAL {
             RRule(const string& rrule, const DateTime& dtstart);
 
             void exclude(const DateTime& exclude);
+            void include(const DateTime& include);
 
             void str(ostream& out) const;
 
@@ -61,6 +62,7 @@ namespace uICAL {
             std::vector<int> bySetPos;
 
             std::vector<DateTime> excludes;
+            std::vector<DateTime> includes;
     };
 
     ostream& operator << (ostream& out, const RRule::Day_pair& dp);

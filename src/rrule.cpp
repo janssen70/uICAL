@@ -172,6 +172,7 @@ namespace uICAL {
 
     void RRule::exclude(const DateTime& exclude) {
         this->excludes.push_back(exclude);
+        sort(this->excludes.begin(), this->excludes.end());
     }
 
     bool RRule::excluded(const DateTime& now) const {
@@ -180,6 +181,11 @@ namespace uICAL {
             return false;
         }
         return true;
+    }
+
+    void RRule::include(const DateTime& exclude) {
+        this->includes.push_back(exclude);
+        sort(this->includes.begin(), this->includes.end());
     }
 
     void RRule::str(ostream& out) const {
