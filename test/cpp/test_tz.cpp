@@ -43,23 +43,24 @@ TEST_CASE("TZ::test1", "[uICAL][TZ]") {
             if (it == tzList.end()) {
                 return uICAL::string("END");
             }
-            uICAL::string ret = dt.datestamp(*it).as_str() + uICAL::string(" ") + (*it)->as_str();
+            auto newt = uICAL::DateTime(dt.datestamp(*it), *it);
+            uICAL::string ret = newt.as_str();
             it++;
             return ret;
         };
 
-        REQUIRE(next() == "20191106T055555 NZDT");
-        REQUIRE(next() == "20191106T055555 NZDT");
-        REQUIRE(next() == "20191105T185555 CET");
-        REQUIRE(next() == "20191105T185555 CET");
-        REQUIRE(next() == "20191105T125555 EST");
-        REQUIRE(next() == "20191105T125555 EST");
-        REQUIRE(next() == "20191105T115555 CST");
-        REQUIRE(next() == "20191105T115555 CST");
-        REQUIRE(next() == "20191105T105555 MST");
-        REQUIRE(next() == "20191105T105555 MST");
-        REQUIRE(next() == "20191105T095555 PST");
-        REQUIRE(next() == "20191105T095555 PST");
+        REQUIRE(next() == "20191106T055555NZDT");
+        REQUIRE(next() == "20191106T055555NZDT");
+        REQUIRE(next() == "20191105T185555CET");
+        REQUIRE(next() == "20191105T185555CET");
+        REQUIRE(next() == "20191105T125555EST");
+        REQUIRE(next() == "20191105T125555EST");
+        REQUIRE(next() == "20191105T115555CST");
+        REQUIRE(next() == "20191105T115555CST");
+        REQUIRE(next() == "20191105T105555MST");
+        REQUIRE(next() == "20191105T105555MST");
+        REQUIRE(next() == "20191105T095555PST");
+        REQUIRE(next() == "20191105T095555PST");
         REQUIRE(next() == "END");
     }
 }
