@@ -24,6 +24,13 @@ namespace uICAL {
         if (!this->repeat || this->currentLine == nullptr) {
             string line;
             if(line.readfrom(this->ical, '\n')) {
+                char p = this->ical.peek();
+                while (p == ' ' || p == '\t') {
+                    string tmp;
+                    tmp.readfrom(this->ical, '\n');
+                    line += tmp;
+                    p = this->ical.peek();
+                }
                 line.rtrim();
                 this->currentLine = new_ptr<VLine>(line);
             }
