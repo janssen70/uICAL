@@ -12,7 +12,7 @@ namespace uICAL {
 
     class VEvent : public Base {
         public:
-            VEvent(const VObject_ptr& event, const TZMap_ptr& tzmap);
+            VEvent(const VObject_ptr& event, const TZMap_ptr& tzmap, const string& default_tz);
 
             void str(ostream& out) const;
 

@@ -4,6 +4,7 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/util.h"
+#include "uICAL/dateperiod.h"
 #include "uICAL/datetime.h"
 #include "uICAL/rrule.h"
 #include "uICAL/vevent.h"
@@ -12,7 +13,7 @@
 #include "uICAL/error.h"
 
 namespace uICAL {
-    VEvent::VEvent(const VObject_ptr& obj, const TZMap_ptr& tzmap) {
+    VEvent::VEvent(const VObject_ptr& obj, const TZMap_ptr& tzmap, const string& default_tz) {
 
         VLine_ptr dtStart = obj->getPropertyByName("DTSTART");
         VLine_ptr dtEnd = obj->getPropertyByName("DTEND");
@@ -20,28 +21,42 @@ namespace uICAL {
         VLine_ptr summary = obj->getPropertyByName("SUMMARY");
 
         if (dtStart == nullptr) { throw ImplementationError("all events must have a DTSTART"); }
-        if (dtEnd == nullptr) { throw ImplementationError("all events must have a DTEND"); }
         if (summary == nullptr) { throw ImplementationError("all events must have a SUMMARY"); }
 
-        this->start = DateTime(dtStart->value + dtStart->getParam("TZID"), tzmap);
-        this->end = DateTime(dtEnd->value + dtStart->getParam("TZID"), tzmap);
+        if (dtStart->getParam("VALUE") == "DATE") {
+            this->start = DateTime(dtStart->value + "T000000" +  dtStart->getParam("TZID"), tzmap, default_tz);
+            if (dtEnd == nullptr) {
+                DatePeriod oneday(86400);
+                this->end = this->start + oneday;
+            } else {
+                this->end = DateTime(dtEnd->value + "T000000" + dtStart->getParam("TZID"), tzmap, default_tz);
+            }
+        } else {
+            this->start = DateTime(dtStart->value + dtStart->getParam("TZID"), tzmap, default_tz);
+            if (dtEnd == nullptr) {
+                DatePeriod oneday(86400);
+                this->end = this->start + oneday;
+            } else {
+                this->end = DateTime(dtEnd->value + dtStart->getParam("TZID"), tzmap, default_tz);
+            }
+        }
 
         this->summary = summary->value;
 
         if (rRule != nullptr) {
-            this->rrule = new_ptr<RRule>(rRule->value, this->start);
+            this->rrule = new_ptr<RRule>(rRule->value, this->start, tzmap, default_tz);
         } else {
-            this->rrule = new_ptr<RRule>("", this->start);
+            this->rrule = new_ptr<RRule>("", this->start, tzmap, default_tz);
         }
 
         auto rdates = obj->getPropertiesByName("RDATE");
         for (auto date : rdates) {
-            this->rrule->include(DateTime(date->value + date->getParam("TZID"), tzmap));
+            this->rrule->include(DateTime(date->value + date->getParam("TZID"), tzmap, default_tz));
         }
 
         auto exdates = obj->getPropertiesByName("EXDATE");
         for (auto date : exdates) {
-            this->rrule->exclude(DateTime(date->value + date->getParam("TZID"), tzmap));
+            this->rrule->exclude(DateTime(date->value + date->getParam("TZID"), tzmap, default_tz));
         }
     }
 

@@ -34,12 +34,12 @@ namespace uICAL {
                 name = tmp->value;
             }
 
-            this->add(tzId, name, offset);
+            this->add(tzId, name, timezone);
         }
     }
 
-    void TZMap::add(const string& id, const string& name, const string& tz) {
-        this->id_attrib_map[id].offset = TZ::parseOffset(tz);
+    void TZMap::add(const string& id, const string& name, const VObject_ptr& timezone) {
+        this->id_attrib_map[id].tziter = new_ptr<TZIter>(timezone);
         this->id_attrib_map[id].name = name;
     }
 
@@ -53,18 +53,22 @@ namespace uICAL {
         return string();
     }
 
-    int TZMap::getOffset(const string& tzId) {
-        return this->id_attrib_map[tzId].offset;
+    seconds_t TZMap::toUTC(const string& id, seconds_t timestamp) {
+        return this->id_attrib_map[id].tziter->toUTC(timestamp);
+    }
+
+    seconds_tz_t TZMap::fromUTC(const string& id, seconds_t timestamp) {
+        return this->id_attrib_map[id].tziter->fromUTC(timestamp);
     }
 
     string TZMap::getName(const string& tzId) {
-        return this->id_attrib_map[tzId].name;
+        return tzId;
     }
 
     void TZMap::str(ostream& out) const {
         for (auto i : this->id_attrib_map) {
             out << i.first << " : " << i.second.name << " : ";
-            TZ::offsetAsString(out, i.second.offset);
+            TZ::offsetAsString(out, -i.second.tziter->toUTC(0));
             out << uICAL::endl;
         }
     }

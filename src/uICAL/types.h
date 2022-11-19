@@ -9,6 +9,7 @@
 
 namespace uICAL {
     using seconds_t = long long int;
+    using seconds_tz_t = std::tuple<seconds_t, string>;
 
     template<typename T, typename... Args> \
     inline std::shared_ptr<T> new_ptr(Args... args) { return std::shared_ptr<T>(new T(args...)); }
@@ -26,6 +27,7 @@ namespace uICAL {
     UICAL_PTR(RRule)
     UICAL_PTR(RRuleIter)
     UICAL_PTR(TZ)
+    UICAL_PTR(TZIter)
     UICAL_PTR(TZMap)
     UICAL_PTR(VComponent)
     UICAL_PTR(VEvent)

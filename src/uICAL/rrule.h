@@ -12,7 +12,7 @@ namespace uICAL {
 
     class RRule : public Base {
         public:
-            RRule(const string& rrule, const DateTime& dtstart);
+            RRule(const string& rrule, const DateTime& dtstart, const TZMap_ptr& tzmap, const string& default_tz);
 
             void exclude(const DateTime& exclude);
             void include(const DateTime& include);
@@ -30,13 +30,12 @@ namespace uICAL {
             using Day_vector = std::vector<Day_pair>;
 
         protected:
-            void parseRRule(const string& rrule);
+            void parseRRule(const string& rrule, const TZMap_ptr& tzmap, const string& default_tz);
 
             Day_vector parseByDay(const string& name) const;
             int parseInt(const string& name) const;
             std::vector<string> parseArray(const string& value) const;
             DateTime::Day parseDay(const string& name) const ;
-            DateTime parseDate(const string& name) const;
 
             const char* dayAsString(DateTime::Day day) const;
             const char* frequencyAsString(Freq freq) const;

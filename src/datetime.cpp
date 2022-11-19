@@ -22,11 +22,15 @@ namespace uICAL {
     }
 
     DateTime::DateTime(const string& datetime) {
-        this->construct(datetime, new_ptr<TZMap>());
+        this->construct(datetime, new_ptr<TZMap>(), "");
     }
 
     DateTime::DateTime(const string& datetime, const TZMap_ptr& tzmap) {
-        this->construct(datetime, tzmap);
+        this->construct(datetime, tzmap, "");
+    }
+
+    DateTime::DateTime(const string& datetime, const TZMap_ptr& tzmap, const string& default_tz) {
+        this->construct(datetime, tzmap, default_tz);
     }
 
     DateTime::DateTime(seconds_t epochSeconds) {
@@ -39,20 +43,33 @@ namespace uICAL {
         this->tz = tz;
     }
 
-    void DateTime::construct(const string& datetime, const TZMap_ptr& tzmap) {
-        if (datetime.length() < 15)
-            throw ValueError(string("Bad datetime: \"") + datetime + "\"");
+    void DateTime::construct(const string& datetime, const TZMap_ptr& tzmap, const string& default_tz) {
+        if (datetime.length() == 8) {
+            DateStamp ds (datetime + "T000000");
+            if (default_tz == "") {
+                this->tz = TZ::unaware();
+                std::cerr << "here" << endl;
+            } else {
+                this->tz = new_ptr<TZ>(default_tz, tzmap);
+            }
+            this->construct(ds, tz);
+        } else {
+            if (datetime.length() < 15)
+                throw ValueError(string("Bad datetime: \"") + datetime + "\"");
 
-        DateStamp ds(datetime.substr(0, 15));
+            DateStamp ds(datetime.substr(0, 15));
 
-        if (datetime.length() > 15) {
-            this->tz = new_ptr<TZ>(datetime.substr(15), tzmap);
+            if (datetime.length() > 15) {
+                this->tz = new_ptr<TZ>(datetime.substr(15), tzmap);
+            } else if (default_tz != "") {
+                this->tz = new_ptr<TZ>(default_tz, tzmap);
+            } else {
+                this->tz = TZ::unaware();
+                std::cerr << "here2" << endl;
+            }
+
+            this->construct(ds, tz);
         }
-        else {
-            this->tz = TZ::unaware();
-        }
-
-        this->construct(ds, tz);
     }
 
     void DateTime::construct(const DateStamp& ds, const TZ_ptr& tz) {
@@ -83,6 +100,10 @@ namespace uICAL {
             std::get<0>(ymdhms), std::get<1>(ymdhms), std::get<2>(ymdhms),
             std::get<3>(ymdhms), std::get<4>(ymdhms), std::get<5>(ymdhms)
         );
+    }
+
+    seconds_t DateTime::seconds() const {
+        return this->epochtime.epochSeconds;
     }
 
     DateTime& DateTime::operator = (const DateTime& other) {
@@ -145,8 +166,7 @@ namespace uICAL {
         out << string::fmt(fmt_02d, std::get<3>(ymdhms));
         out << string::fmt(fmt_02d, std::get<4>(ymdhms));
         out << string::fmt(fmt_02d, std::get<5>(ymdhms));
-
-        this->tz->str(out);
+        out << std::get<6>(ymdhms);
     }
 
     unsigned DateTime::daysUntil(DateTime::Day today, DateTime::Day then) {

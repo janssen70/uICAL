@@ -9,7 +9,7 @@
 #include "uICAL/rrule.h"
 
 namespace uICAL {
-    RRule::RRule(const string& rrule, const DateTime& dtstart)
+    RRule::RRule(const string& rrule, const DateTime& dtstart, const TZMap_ptr& tzmap, const string& default_tz)
     : dtstart(dtstart)
     {
         this->freq = Freq::NONE;
@@ -18,14 +18,14 @@ namespace uICAL {
         this->count = -1;
 
         if (rrule.empty())
-            this->parseRRule("FREQ=DAILY;COUNT=1");
+            this->parseRRule("FREQ=DAILY;COUNT=1", tzmap, default_tz);
         else
-            this->parseRRule(rrule);
+            this->parseRRule(rrule, tzmap, default_tz);
 
         log_trace("%s", this->as_str().c_str());
     }
 
-    void RRule::parseRRule(const string& rrule) {
+    void RRule::parseRRule(const string& rrule, const TZMap_ptr& tzmap, const string& default_tz) {
         rrule.tokenize(';', [&](const string part){
             size_t equals = part.find("=");
             const string key = part.substr(0, equals);
@@ -50,7 +50,7 @@ namespace uICAL {
                 this->interval = this->parseInt(value);
             }
             else if (key == "UNTIL") {
-                this->until = this->parseDate(value);
+                this->until = DateTime(value, tzmap, default_tz);
             }
             else if (key == "COUNT") {
                 this->count = this->parseInt(value);
@@ -126,10 +126,6 @@ namespace uICAL {
         if (value == "FR") return DateTime::Day::FRI;
         if (value == "SA") return DateTime::Day::SAT;
         throw ParseError(string("Unknown day name: ") + value);
-    }
-
-    DateTime RRule::parseDate(const string& value) const {
-        return DateTime(value);
     }
 
     const char* RRule::dayAsString(DateTime::Day day) const {

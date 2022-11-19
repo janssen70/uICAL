@@ -5,6 +5,7 @@
 #define uical_tzinfo_h
 
 #include "uICAL/base.h"
+#include "uICAL/tziter.h"
 
 namespace uICAL {
     class VComponent;
@@ -17,17 +18,19 @@ namespace uICAL {
 
             string findId(const string& nameOrId) const;
 
-            int getOffset(const string& tzId);
+            seconds_t toUTC(const string& tzId, seconds_t timestamp);
+            seconds_tz_t fromUTC(const string& tzId, seconds_t timestamp);
+
             string getName(const string& tzId);
 
             void str(ostream& out) const;
 
         protected:
-            void add(const string& id, const string& name, const string& tz);
+            void add(const string& id, const string& name, const VObject_ptr& tz);
             int parseOffset(const string& offset) const;
 
             typedef struct {
-                int offset;
+                TZIter_ptr tziter;
                 string name;
             } attribs_t;
 

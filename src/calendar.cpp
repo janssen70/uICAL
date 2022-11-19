@@ -36,16 +36,23 @@ namespace uICAL {
         VObjectStream::lineP_t useLine = [](const string parent, const string line) {
             if (parent == "VCALENDAR") {
                 if (line.empty()) return true;
+                if (line == "X-WR-TIMEZONE") return true;
             }
             else
             if (parent == "VTIMEZONE") {
                 if (line.empty()) return true;
                 if (line == "TZID") return true;
             }
-            else if (parent == "STANDARD") {
+            else if (parent == "STANDARD" || parent == "DAYLIGHT") {
                 if (line.empty()) return true;
                 if (line == "TZOFFSETFROM") return true;
+                if (line == "TZOFFSETTO") return true;
                 if (line == "TZNAME") return true;
+                if (line == "DTSTART") return true;
+                if (line == "DTSTART") return true;
+                if (line == "RRULE") return true;
+                if (line == "EXDATE") return true;
+                if (line == "RDATE") return true;
             }
             else if (parent == "VEVENT") {
                 if (line.empty()) return true;
@@ -63,12 +70,16 @@ namespace uICAL {
 
         VObjectStream stm(lines, useLine);
 
+        string default_tz;
         {
             VObject_ptr obj = stm.nextObject(false);
 
             if (obj->getName() != "VCALENDAR") {
                 log_error("Parse error, did not expect: %s", obj->getName().c_str());
                 throw ParseError(string("Parse error, did not expect: ") + obj->getName().c_str());
+            }
+            if (obj->getPropertyByName("X-WR-TIMEZONE")) {
+                default_tz = obj->getPropertyByName("X-WR-TIMEZONE")->value;
             }
         }
 
@@ -79,12 +90,12 @@ namespace uICAL {
             if (child == nullptr) {
                 break;
             }
-
             if (child->getName() == "VTIMEZONE") {
                 tzmap->add(child);
             }
+
             else if (child->getName() == "VEVENT") {
-                VEvent_ptr event = new_ptr<VEvent>(child, tzmap);
+                VEvent_ptr event = new_ptr<VEvent>(child, tzmap, default_tz);
                 if (addEvent(*event)) {
                     cal->addEvent(event);
                 } else {

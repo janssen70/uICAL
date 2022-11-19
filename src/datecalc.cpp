@@ -13,10 +13,10 @@ namespace uICAL {
     //                 d is in [1, last_day_of_month(y, m)]
     //                 y is a year after 1970-01-01
     // Source: http://howardhinnant.github.io/date_algorithms.html#days_from_civil
-    unsigned days_from_civil(int y, unsigned m, unsigned d) noexcept
+    signed days_from_civil(int y, unsigned m, unsigned d) noexcept
     {
         y -= m <= 2;
-        const unsigned era = (y >= 0 ? y : y-399) / 400;
+        const int era = (y >= 0 ? y : y-399) / 400;
         const unsigned yoe = y - era * 400;                             // [0, 399]
         const unsigned doy = (153*(m + (m > 2 ? -3 : 9)) + 2)/5 + d-1;  // [0, 365]
         const unsigned doe = yoe * 365 + yoe/4 - yoe/100 + doy;         // [0, 146096]
@@ -69,27 +69,46 @@ namespace uICAL {
     // Returns day of week in civil calendar [0, 6] -> [Sun, Sat]
     // Preconditions:  z is number of days since 1970-01-01
     // Source: http://howardhinnant.github.io/date_algorithms.html#weekday_from_days
-    unsigned weekday_from_days(unsigned z) noexcept
+    unsigned weekday_from_days(signed z) noexcept
     {
-        return (z+4) % 7;
+        return (z >= -4 ? (z+4) % 7 : (z+5) % 7 + 6);
     }
 
     dhms_t to_dhms(seconds_t seconds) {
         unsigned hour, minute, second;
+        if (seconds < 0) {
+            seconds_t days = seconds / 86400;
+            seconds -= (seconds_t)(days * 86400);
+            if (seconds < 0) {
+                --days;
+                seconds += 86400;
+            }
 
-        second = seconds % 60;
-        seconds /= 60;
+            second = seconds % 60;
+            seconds /= 60;
 
-        minute = seconds % 60;
-        seconds /= 60;
+            minute = seconds % 60;
+            seconds /= 60;
 
-        hour = seconds % 24;
-        seconds /= 24;
+            hour = seconds % 24;
+            seconds /= 24;
+
+            seconds = days;
+        } else {
+            second = seconds % 60;
+            seconds /= 60;
+
+            minute = seconds % 60;
+            seconds /= 60;
+
+            hour = seconds % 24;
+            seconds /= 24;
+        }
 
         return dhms_t(seconds, hour, minute, second);
     }
 
-    seconds_t to_seconds(unsigned day, unsigned hour, unsigned minute, unsigned second) {
+    seconds_t to_seconds(signed day, unsigned hour, unsigned minute, unsigned second) {
         return (seconds_t)day * 60 * 60 * 24 + hour * 60 * 60 + minute * 60 + second;
     }
 }

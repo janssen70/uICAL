@@ -7,7 +7,6 @@
 #include "uICAL/base.h"
 
 namespace uICAL {
-    class DateStamp;
     class TZMap;
 
     class TZ : public Base {
@@ -22,21 +21,20 @@ namespace uICAL {
             TZ(const string& tz, const TZMap_ptr& tzmap);
 
             seconds_t toUTC(seconds_t timestamp) const;
-            seconds_t fromUTC(seconds_t timestamp) const;
+            seconds_tz_t fromUTC(seconds_t timestamp) const;
 
             bool is_aware() const;
-            int offset() const;
 
             void str(ostream& out) const;
 
-            static int parseOffset(const string& offset);
+            static int parseOffsetSecs(const string& offset);
             static void offsetAsString(ostream& out, int offsetMins);
 
+            int offsetSecs;
         protected:
             bool aware;
 
         private:
-            int offsetMins;
             const TZMap_ptr idmap;
             string id;
     };

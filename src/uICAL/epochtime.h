@@ -16,11 +16,10 @@ namespace uICAL {
             EpochTime(seconds_t seconds);
 
             using ymd_t = std::tuple<unsigned, unsigned, unsigned>;
-            using ymdhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned>;
+            using ymdhms_t = std::tuple<unsigned, unsigned, unsigned, unsigned, unsigned, unsigned, string>;
 
             bool valid() const;
 
-            ymd_t ymd(const TZ_ptr tz) const;
             ymdhms_t ymdhms(const TZ_ptr tz) const;
 
             seconds_t operator - (const EpochTime& other) const;

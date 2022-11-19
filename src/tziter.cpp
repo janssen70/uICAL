@@ -26,9 +26,9 @@ namespace uICAL {
         while (timestamp > this->transitions.back().local && this->next())
             {}
         
-        auto i = this->transitions.rend();
+        auto i = this->transitions.begin();
         while (1) {
-            if (i + 1 == this->transitions.rend() || timestamp < (i + 1)->local) {
+            if (i + 1 == this->transitions.end() || timestamp <= (i + 1)->local) {
                 return timestamp - i->offset;
             }
             ++i;
@@ -39,9 +39,9 @@ namespace uICAL {
         if (this->timezone) { this->init(); }
         
         while (timestamp > this->transitions.back().utc && this->next()) { }
-        auto i = this->transitions.rend();
+        auto i = this->transitions.begin();
         while (1) {
-            if (i + 1 == this->transitions.rend() || timestamp <= (i + 1)->utc) {
+            if (i + 1 == this->transitions.end() || timestamp <= (i + 1)->utc) {
                 return seconds_tz_t(timestamp + i->offset, i->name);
             }
             ++i;
@@ -49,14 +49,15 @@ namespace uICAL {
     }
 
     void TZIter::init() {
-        auto objs = timezone->listObjects("STANDARD");
+        auto objs = this->timezone->listObjects("STANDARD");
         for (auto obj: objs) {
             components.push_back(parse_stuff(obj));
         }
-        objs = timezone->listObjects("DAYLIGHT");
+        objs = this->timezone->listObjects("DAYLIGHT");
         for (auto obj: objs) {
             components.push_back(parse_stuff(obj));
         }
+        this->timezone = NULL;
         
         this->next();
     }
@@ -77,9 +78,9 @@ namespace uICAL {
         
         auto start = DateTime(ds, tzFrom);
         if (rRule != nullptr) {
-            rrule = new_ptr<RRule>(rRule->value, start);
+            rrule = new_ptr<RRule>(rRule->value, start, nullptr, "");
         } else {
-            rrule = new_ptr<RRule>("", start);
+            rrule = new_ptr<RRule>("", start, nullptr, "");
         }
         
         auto rdates = obj->getPropertiesByName("RDATE");
@@ -95,6 +96,9 @@ namespace uICAL {
         }
         auto iter = new_ptr<RRuleIter>(rrule, DateTime(), DateTime());
         iter->next();
+        if (!iter->now().valid()) {
+            std::cout << "hmmm" << endl;
+        }
         
         TZIter::tzcomp_t ret = {iter, tzFrom, tzTo, tzName->value};
         return ret;
@@ -106,7 +110,7 @@ namespace uICAL {
         }
         
         auto i = std::min_element(this->components.begin(), this->components.end());
-        TZIter::transitions_t t = {i->rr->now().seconds(), i->rr->now().seconds(), 0, i->name};
+        TZIter::transitions_t t = {i->rr->now().seconds(), i->rr->now().seconds(), i->to->offsetSecs, i->name};
         this->transitions.push_back(t);
         if (!i->rr->next()) {
             this->components.erase(i);

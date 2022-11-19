@@ -17,6 +17,7 @@ namespace uICAL {
             DateTime();
             DateTime(const string& datetime);
             DateTime(const string& datetime, const TZMap_ptr& tzmap);
+            DateTime(const string& datetime, const TZMap_ptr& tzmap, const string& default_tz);
             DateTime(const DateStamp& datestamp, const TZ_ptr& tz);
             DateTime(seconds_t epochSeconds);
             DateTime(seconds_t epochSeconds, const TZ_ptr& tz);
@@ -28,6 +29,7 @@ namespace uICAL {
 
             DateStamp datestamp() const;
             DateStamp datestamp(const TZ_ptr& tz) const;
+            seconds_t seconds() const;
 
             enum class Day {
                 NONE, MON, TUE, WED, THU, FRI, SAT, SUN
@@ -51,7 +53,7 @@ namespace uICAL {
             TZ_ptr tz;
 
         protected:
-            void construct(const string& datetime, const TZMap_ptr& tzmap);
+            void construct(const string& datetime, const TZMap_ptr& tzmap, const string& default_tz);
             void construct(const DateStamp& ds, const TZ_ptr& tz);
             void assert_awareness(const DateTime& other) const;
 

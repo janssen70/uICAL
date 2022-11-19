@@ -27,22 +27,16 @@ namespace uICAL {
         return this->epochSeconds != NaN;
     }
 
-    EpochTime::ymd_t EpochTime::ymd(const TZ_ptr tz) const {
-        unsigned seconds = tz->fromUTC(this->epochSeconds);
-        auto ymd = civil_from_days(seconds / (24 * 60 * 60));
-
-        return ymd_t(std::get<0>(ymd), std::get<1>(ymd), std::get<2>(ymd));
-    }
-
     EpochTime::ymdhms_t EpochTime::ymdhms(const TZ_ptr tz) const {
-        seconds_t seconds = tz->fromUTC(this->epochSeconds);
-        auto dhms = to_dhms(seconds);
+        seconds_tz_t seconds = tz->fromUTC(this->epochSeconds);
+        auto dhms = to_dhms(std::get<0>(seconds));
 
         auto ymd = civil_from_days(std::get<0>(dhms));
 
         return ymdhms_t(
             std::get<0>(ymd), std::get<1>(ymd), std::get<2>(ymd),
-            std::get<1>(dhms), std::get<2>(dhms), std::get<3>(dhms)
+            std::get<1>(dhms), std::get<2>(dhms), std::get<3>(dhms),
+            std::get<1>(seconds)
         );
     }
 

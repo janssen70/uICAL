@@ -58,7 +58,7 @@ namespace uICAL {
         ostream m;
         for (;;) {
             m << "Invalid ";
-            if (this->year < 1970) {
+            if (this->year < 1) {
                 m << "year: " << year; break;
             }
             if (this->month < 1 || this->month > 12) {
