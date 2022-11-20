@@ -41,7 +41,7 @@ namespace uICAL {
 
             void init();
             bool next();
-            tzcomp_t parse_stuff(const VObject_ptr& obj);
+            tzcomp_t parse_stuff(const VObject_ptr& obj, bool standard_time);
             
     };
 

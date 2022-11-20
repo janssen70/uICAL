@@ -51,18 +51,18 @@ namespace uICAL {
     void TZIter::init() {
         auto objs = this->timezone->listObjects("STANDARD");
         for (auto obj: objs) {
-            components.push_back(parse_stuff(obj));
+            components.push_back(parse_stuff(obj, true));
         }
         objs = this->timezone->listObjects("DAYLIGHT");
         for (auto obj: objs) {
-            components.push_back(parse_stuff(obj));
+            components.push_back(parse_stuff(obj, false));
         }
         this->timezone = NULL;
         
         this->next();
     }
 
-    TZIter::tzcomp_t TZIter::parse_stuff(const VObject_ptr& obj) {
+    TZIter::tzcomp_t TZIter::parse_stuff(const VObject_ptr& obj, bool standard_time) {
         VLine_ptr dtStart = obj->getPropertyByName("DTSTART");
         VLine_ptr offsetFrom = obj->getPropertyByName("TZOFFSETFROM");
         VLine_ptr offsetTo = obj->getPropertyByName("TZOFFSETTO");
@@ -100,7 +100,15 @@ namespace uICAL {
             std::cout << "hmmm" << endl;
         }
         
-        TZIter::tzcomp_t ret = {iter, tzFrom, tzTo, tzName->value};
+        TZIter::tzcomp_t ret;
+        if (tzName != nullptr) {
+            ret = {iter, tzFrom, tzTo, tzName->value};
+        } else if (standard_time) {
+            ret = {iter, tzFrom, tzTo, "STANDARD"};
+        } else {
+            ret = {iter, tzFrom, tzTo, "DAYLIGHT"};
+        }
+
         return ret;
     }
 
