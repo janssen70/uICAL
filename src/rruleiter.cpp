@@ -115,7 +115,10 @@ namespace uICAL {
 
     bool RRuleIter::nextNow() {
         DateTime cascade_now = DateTime(this->cascade->value(), this->rr->dtstart.tz);
-        if (this->include != this->rr->includes.end() && * this->include < cascade_now) {
+        if (this->current_now == this->rr->dtstart && !(this->current_now == cascade_now)) {
+            // started at dstart, but dtstart isn't in the rrule,
+            // don't do anything so setCurrentNow starts at the beginning of the cascade
+        } else if (this->include != this->rr->includes.end() && * this->include < cascade_now) {
             ++ this->include;
         } else if (this->count != 0) {
             while (this->include != this->rr->includes.end() && * this->include == cascade_now) {
@@ -142,8 +145,12 @@ namespace uICAL {
     }
 
     bool RRuleIter::setCurrentNow() {
-        DateStamp now = this->cascade->value();
-        this->current_now = DateTime(now, this->rr->dtstart.tz);
+        if (this->current_now.valid()) {
+            DateStamp now = this->cascade->value();
+            this->current_now = DateTime(now, this->rr->dtstart.tz);
+        } else {
+            this->current_now = DateTime(this->rr->dtstart);
+        }
         if (this->rr->until.valid() && this->current_now > this->rr->until) {
             this->count = 0;
         }
