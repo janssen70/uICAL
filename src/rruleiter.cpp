@@ -60,7 +60,9 @@ namespace uICAL {
         this->include = this->rr->includes.begin();
         this->exclude = this->rr->excludes.begin();
 
-        this->setCurrentNow();
+        if (!this->setCurrentNow()) {
+            return false;
+        }
 
         if (this->range_begin.valid()) {
             while (this->now() < this->range_begin) {
