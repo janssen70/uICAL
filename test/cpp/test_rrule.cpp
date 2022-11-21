@@ -86,7 +86,7 @@ void test_basic(std::string dtstart, std::string rrule, std::string begin, std::
             rrBegin = uICAL::DateTime(begin);
         }
 
-        uICAL::RRule_ptr rr = uICAL::new_ptr<uICAL::RRule>(lrrule->value, start);
+        uICAL::RRule_ptr rr = uICAL::new_ptr<uICAL::RRule>(lrrule->value, start, nullptr, "");
         for (std::string exclude : excludes) {
             uICAL::VLine_ptr excl = uICAL::new_ptr<uICAL::VLine>(exclude);
             rr->exclude(uICAL::DateTime(excl->value));
@@ -162,7 +162,7 @@ TEST_CASE("RRule::test2", "[uICAL][RRule]") {
     uICAL::string end("29970902T090000");
 
     auto rr = uICAL::RRuleIter(
-        uICAL::new_ptr<uICAL::RRule>(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware())),
+        uICAL::new_ptr<uICAL::RRule>(rrule, uICAL::DateTime(dtstart, uICAL::TZ::unaware()), nullptr, ""),
         uICAL::DateTime(), uICAL::DateTime());
 
     REQUIRE_THROWS_WITH(rr.now(), "RecurrenceError: Not yet initialised, call next() first");
@@ -188,7 +188,7 @@ TEST_CASE("RRULE::str", "[uICAL][RRule]") {
     uICAL::string rule("FREQ=DAILY;COUNT=4");
     uICAL::string dtstart("19970902T090000");
 
-    uICAL::RRule_ptr rrule = uICAL::new_ptr<uICAL::RRule>(rule, dtstart);
+    uICAL::RRule_ptr rrule = uICAL::new_ptr<uICAL::RRule>(rule, dtstart, nullptr, "");
 
     REQUIRE(rrule->as_str() == "RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4;WKST=MO");
 }
@@ -197,7 +197,7 @@ TEST_CASE("RRULE::empty", "[uICAL][RRule]") {
     uICAL::string rule("");
     uICAL::string dtstart("19970902T090000");
 
-    auto rrule = uICAL::RRule(rule, dtstart);
+    auto rrule = uICAL::RRule(rule, dtstart, nullptr, "");
 
     REQUIRE(rrule.as_str() == "RRULE:FREQ=DAILY;INTERVAL=1;COUNT=1;WKST=MO");
 }
@@ -206,7 +206,7 @@ TEST_CASE("RRULE::bad_freq", "[uICAL][RRule]") {
     uICAL::string rule("FREQ=FORTNIGHTLY");
     uICAL::string dtstart("19970902T090000");
 
-    REQUIRE_THROWS_WITH(uICAL::RRule(rule, dtstart), "ParseError: Unknown RRULE:FREQ type: FORTNIGHTLY");
+    REQUIRE_THROWS_WITH(uICAL::RRule(rule, dtstart, nullptr, ""), "ParseError: Unknown RRULE:FREQ type: FORTNIGHTLY");
 }
 
 // TEST_CASE("RRULE::bad_indexs", "[uICAL][RRule]") {
@@ -225,7 +225,7 @@ TEST_CASE("RRULE::negative_range", "[uICAL][RRule]") {
     uICAL::string end("19970901T090000");
 
     REQUIRE_THROWS_WITH(
-        uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("", uICAL::DateTime(dtstart)),
+        uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("", uICAL::DateTime(dtstart), nullptr, ""),
                          uICAL::DateTime(begin),
                          uICAL::DateTime(end)),
         "ValueError: Begin and end describe a negative range"
@@ -237,7 +237,7 @@ TEST_CASE("RRULE::negative_end", "[uICAL][RRule]") {
     uICAL::string begin("19970802T090000");
     uICAL::string end("19970901T090000");
 
-    auto rruleIt = uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("", uICAL::DateTime(dtstart)),
+    auto rruleIt = uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("", uICAL::DateTime(dtstart), nullptr, ""),
                                     uICAL::DateTime(begin),
                                     uICAL::DateTime(end));
 
@@ -262,7 +262,8 @@ TEST_CASE("RRULE::done_before_begin", "[uICAL][RRule]") {
     uICAL::string end("19971130T090000");
 
     auto rruleIt = uICAL::RRuleIter(uICAL::new_ptr<uICAL::RRule>("FREQ=DAILY;WKST=MO;COUNT=10",
-                                                                 uICAL::DateTime(dtstart)),
+                                                                 uICAL::DateTime(dtstart),
+                                                                 nullptr, ""),
                                     uICAL::DateTime(begin),
                                     uICAL::DateTime(end));
     REQUIRE(rruleIt.next() == false);

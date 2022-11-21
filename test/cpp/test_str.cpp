@@ -75,7 +75,7 @@ TEST_CASE("STR::obj", "[uICAL][STR]") {
 
         REQUIRE(obj->as_str() == event1);
 
-        uICAL::VEvent_ptr event = uICAL::new_ptr<uICAL::VEvent>(obj, tzmap);
+        uICAL::VEvent_ptr event = uICAL::new_ptr<uICAL::VEvent>(obj, tzmap, "");
 
         REQUIRE(event->as_str() ==
             "VEVENT: Irrigation Beds\n"
