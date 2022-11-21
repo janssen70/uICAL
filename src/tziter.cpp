@@ -4,6 +4,7 @@
 #include "uICAL/cppstl.h"
 #include "uICAL/types.h"
 #include "uICAL/util.h"
+#include "uICAL/error.h"
 #include "uICAL/datetime.h"
 #include "uICAL/datestamp.h"
 #include "uICAL/rrule.h"
@@ -97,7 +98,7 @@ namespace uICAL {
         auto iter = new_ptr<RRuleIter>(rrule, DateTime(), DateTime());
         iter->next();
         if (!iter->now().valid()) {
-            std::cout << "hmmm" << endl;
+            throw ImplementationError("Now is invalid");
         }
         
         TZIter::tzcomp_t ret;

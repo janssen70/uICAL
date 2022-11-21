@@ -48,7 +48,6 @@ namespace uICAL {
             DateStamp ds (datetime + "T000000");
             if (default_tz == "") {
                 this->tz = TZ::unaware();
-                std::cerr << "here" << endl;
             } else {
                 this->tz = new_ptr<TZ>(default_tz, tzmap);
             }
@@ -65,7 +64,6 @@ namespace uICAL {
                 this->tz = new_ptr<TZ>(default_tz, tzmap);
             } else {
                 this->tz = TZ::unaware();
-                std::cerr << "here2" << endl;
             }
 
             this->construct(ds, tz);
