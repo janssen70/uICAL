@@ -34,7 +34,7 @@ namespace uICAL {
                 string(const StringSumHelper& ssh) : String(ssh) {}
 
                 string substr(size_t from) const { return string(String::substring(from)); }
-                string substr(size_t from, size_t len) const { return string(String::substring(from, from + len)); }
+                string substr(size_t from, size_t len) const { if (len == npos) { return string(String::substring(from); } else { return string(String::substring(from, from + len)); }}
 
                 bool empty() const { return String::length() == 0; }
                 size_t find(const char* val, size_t pos = 0) const { return String::indexOf(val, pos); }
