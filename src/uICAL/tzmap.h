@@ -20,6 +20,7 @@ namespace uICAL {
 
             seconds_t toUTC(const string& tzId, seconds_t timestamp);
             seconds_tz_t fromUTC(const string& tzId, seconds_t timestamp);
+            start_offset_tz_t next_transition_UTC(const string& tzId, seconds_t timestamp);
 
             string getName(const string& tzId);
 

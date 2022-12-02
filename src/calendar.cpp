@@ -8,6 +8,7 @@
 #include "uICAL/logging.h"
 #include "uICAL/calendar.h"
 #include "uICAL/calendarentry.h"
+#include "uICAL/tz.h"
 #include "uICAL/tzmap.h"
 #include "uICAL/vevent.h"
 #include "uICAL/vobject.h"
@@ -103,10 +104,19 @@ namespace uICAL {
                 }
             }
         }
+        if (!default_tz.empty()) {
+            cal->default_tz = new_ptr<TZ>(default_tz, tzmap);
+        } else {
+            cal->default_tz = new_ptr<TZ>("Z");
+        }
         return cal;
     }
 
-    Calendar::Calendar() {}
+    TZ_ptr Calendar::tz() {
+        return default_tz;
+    }
+
+    Calendar::Calendar(): default_tz(TZ::undef()) {}
 
     void Calendar::addEvent(const VEvent_ptr& event) {
         this->events.push_back(event);

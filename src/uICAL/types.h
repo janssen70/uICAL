@@ -8,8 +8,10 @@
 #include "uICAL/string.h"
 
 namespace uICAL {
+    #define MAX_UICAL_SECONDS LLONG_MAX
     using seconds_t = long long int;
     using seconds_tz_t = std::tuple<seconds_t, string>;
+    using start_offset_tz_t = std::tuple<seconds_t, seconds_t, string>;
 
     template<typename T, typename... Args> \
     inline std::shared_ptr<T> new_ptr(Args... args) { return std::shared_ptr<T>(new T(args...)); }

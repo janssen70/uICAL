@@ -49,6 +49,19 @@ namespace uICAL {
         }
     }
 
+    start_offset_tz_t TZIter::next_transition_UTC(seconds_t timestamp) {
+        if (this->timezone) { this->init(); }
+
+        while (timestamp >= this->transitions.back().utc && this->next()) { }
+        for (auto i = this->transitions.begin(); i != this->transitions.end(); ++i) {
+            if (timestamp <= i->utc) {
+                return start_offset_tz_t(i->utc, i->offset, i->name);
+            }
+        }
+        auto i = this->transitions.back();
+        return start_offset_tz_t(MAX_UICAL_SECONDS, i.offset, i.name);
+    }
+
     void TZIter::init() {
         auto objs = this->timezone->listObjects("STANDARD");
         for (auto obj: objs) {

@@ -16,6 +16,7 @@ namespace uICAL {
             TZIter(const VObject_ptr& timezone);
             seconds_t toUTC(seconds_t timestamp);
             seconds_tz_t fromUTC(seconds_t timestamp);
+            start_offset_tz_t next_transition_UTC(seconds_t timestamp);
 
             typedef struct {
                 RRuleIter_ptr rr;

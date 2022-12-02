@@ -22,6 +22,7 @@ namespace uICAL {
 
             seconds_t toUTC(seconds_t timestamp) const;
             seconds_tz_t fromUTC(seconds_t timestamp) const;
+            start_offset_tz_t next_transition_UTC(seconds_t timestamp) const;
 
             bool is_aware() const;
 

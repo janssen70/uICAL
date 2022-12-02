@@ -60,6 +60,9 @@ namespace uICAL {
     seconds_tz_t TZMap::fromUTC(const string& id, seconds_t timestamp) {
         return this->id_attrib_map[id].tziter->fromUTC(timestamp);
     }
+    start_offset_tz_t TZMap::next_transition_UTC(const string& id, seconds_t timestamp) {
+        return this->id_attrib_map[id].tziter->next_transition_UTC(timestamp);
+    }
 
     string TZMap::getName(const string& tzId) {
         return tzId;

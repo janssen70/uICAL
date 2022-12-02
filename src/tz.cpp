@@ -132,6 +132,15 @@ namespace uICAL {
         return seconds_tz_t(timestamp + this->offsetSecs, this->as_str());
     }
 
+    start_offset_tz_t TZ::next_transition_UTC(seconds_t timestamp) const {
+        if (!this->id.empty()) {
+            return this->idmap->next_transition_UTC(this->id, timestamp);
+        }
+        if (this->offsetSecs == -1)
+            throw ImplementationError("Timezone not defined");
+        return start_offset_tz_t(MAX_UICAL_SECONDS, this->offsetSecs, this->as_str());
+    }
+
     void TZ::str(ostream& out) const {
         if (!this->id.empty()) {
             out << this->idmap->getName(this->id);

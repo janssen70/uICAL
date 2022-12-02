@@ -22,10 +22,13 @@ namespace uICAL {
 
             void str(ostream& out) const;
 
+            TZ_ptr tz();
+
             friend class CalendarIter;
         protected:
             using events_t = std::vector<VEvent_ptr>;
             events_t events;
+            TZ_ptr default_tz;
     };
 }
 #endif
