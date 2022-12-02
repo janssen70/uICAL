@@ -6,6 +6,7 @@
 
 #include "uICAL/stream.h"
 #include "uICAL/string.h"
+#include <climits>
 
 namespace uICAL {
     #define MAX_UICAL_SECONDS LLONG_MAX
