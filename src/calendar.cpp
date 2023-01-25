@@ -105,7 +105,11 @@ namespace uICAL {
             }
         }
         if (!default_tz.empty()) {
-            cal->default_tz = new_ptr<TZ>(default_tz, tzmap);
+            try {
+                cal->default_tz = new_ptr<TZ>(default_tz, tzmap);
+            } catch (uICAL::ValueError &e) {
+                cal->default_tz = new_ptr<TZ>("Z");
+            }
         } else {
             cal->default_tz = new_ptr<TZ>("Z");
         }
