@@ -22,7 +22,7 @@ namespace uICAL {
 
         protected:
             ByAndCounter(std::vector<Counter_ptr> counters);
-            virtual ~ByAndCounter() = default;
+            virtual ~ByAndCounter() noexcept = default;
 
             virtual const string name() const { return "ByAndCounter"; };
             virtual void wrap();

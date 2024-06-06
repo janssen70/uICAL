@@ -23,7 +23,7 @@ namespace uICAL {
 
         protected:
             BySetPosCounter(Counter_ptr counter, const values_t& values);
-            virtual ~BySetPosCounter() = default;
+            virtual ~BySetPosCounter() noexcept = default;
 
             Counter_ptr counter;
             std::vector<DateStamp> results;

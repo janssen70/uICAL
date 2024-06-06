@@ -14,7 +14,7 @@ namespace uICAL {
             using ptr = std::shared_ptr<Counter>;
 
             Counter() {}
-            virtual ~Counter() = default;
+            virtual ~Counter() noexcept = default;
 
             virtual bool reset(const DateStamp& base);
             virtual bool next() { return true; }
@@ -44,7 +44,7 @@ namespace uICAL {
             using it_t = typename values_t::const_iterator;
 
         public:
-            virtual ~CounterT() = default;
+            virtual ~CounterT() noexcept = default;
 
             virtual bool next() {
                 ++ this->it;
