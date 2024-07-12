@@ -6,6 +6,7 @@
 #endif
 #define uical_cppstl_h
 
+#include <stdexcept>
 #include <algorithm>
 #include <functional>
 #include <memory>

@@ -15,7 +15,7 @@ namespace uICAL {
             using sync_f = std::function<void(counters_t::iterator it)>;
 
             Cascade() {}
-            virtual ~Cascade() = default;
+            virtual ~Cascade() noexcept = default;
 
             virtual bool reset(const DateStamp& base);
             virtual bool next();
