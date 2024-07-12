@@ -1,0 +1,46 @@
+# Alternative Makefile is called from top-level build system
+# to build uICAL in my own projects
+
+include Rules.mk
+
+BASEPATH:=$(abspath .)
+TARGET_BASE:=$(notdir $(BASEPATH))
+TARGET_OUT=$(NONSHARED_LIBS_BASE_DIR)/$(TARGET_BASE)/$(OUT_DIR)
+
+SOURCES:=$(wildcard src/*.cpp)
+OBJS:=$(patsubst src/%.cpp,$(TARGET_OUT)/%.o,$(SOURCES))
+
+TARGET_BASENAME:=libuICAL
+BUILD_TARGET:=$(TARGET_OUT)/$(TARGET_BASENAME).a
+
+CXXFLAGS+=$(DEFAULTCXXFLAGS)
+
+LINKFLAGS+=$(LINKFLAGS_ARCH)
+
+# $(info *** uICAL sources: $(OBJS))
+# $(info *** uICAL Build-target: $(BUILD_TARGET))
+
+all: $(BUILD_TARGET)
+
+$(BUILD_TARGET): $(OBJS)
+	$(AR) -ru $@ $(OBJS)
+	ls -l $@
+	$(RANLIB) $@
+
+staticcheck:
+	$(CPPCHECK) --enable=all --inconclusive $(DEFAULTCXXDEFINES) $(DEFAULTCXXINCLUDES) $(SOURCES)
+
+clean:
+	rm -f $(BUILD_TARGET) $(TARGET_OUT)/*.o $(TARGET_OUT)/*.a *.lnt *TMP *~* dump
+	- $(CTAGS) -R
+
+$(OBJS): | $(TARGET_OUT)
+
+$(TARGET_OUT):
+	mkdir -p $@
+
+$(TARGET_OUT)/%.o : src/%.cpp
+	$(info Compiling $<...)
+	$(CXX) $(CFLAGS) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+#vim: set ft=make :
